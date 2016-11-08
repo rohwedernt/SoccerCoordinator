@@ -274,19 +274,6 @@ teamsToSwap()
 // Calculate difference between tallest and shortest team averages
 var diff = tallestAvgHeight - shortestAvgHeight
 
-//
-//
-// These were for my own use, should they be left in here
-//
-//
-shortestTeam
-shortestAvgHeight
-tallestTeam
-tallestAvgHeight
-
-
-// Could also check to see if delta is still valid, is it still improving and stop iterating
-
 // Determines if the team averages are within or outside of the 1.5inch limit and if they are not balanced correctly executes the following code
 if tallestAvgHeight - shortestAvgHeight > 1.5 {
     
@@ -324,18 +311,6 @@ if tallestAvgHeight - shortestAvgHeight > 1.5 {
             plHtShortest = pl.value
         }
     }
-    
-    //
-    //
-    // These were for my own use, should they be left in here
-    //
-    //
-    plNameTallest
-    plHtTallest
-    plNameShortest
-    plHtShortest
-    minDiff
-    
     
     // Switches the players to the other team by updating the teamRosters data
     teamRosters[plNameShortest] = tallestTeam
