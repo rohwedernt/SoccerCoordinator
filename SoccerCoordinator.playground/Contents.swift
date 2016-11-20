@@ -1,12 +1,12 @@
-import UIKit
+// iOS Tech Degree Project-01 Soccer Coordinator
+// Nate Rohweder
 
-// Player data, array of dictionaries
 var players = [
     [
         "Player Name": "Joe Smith",
         "Height": "42",
         "Soccer Experience": "Yes",
-        "Guardian Name": "jimAndJanSmith"
+        "Guardian Name": "Jim and Jan Smith"
     ],
     [
         "Player Name": "Jill Tanner",
@@ -60,7 +60,7 @@ var players = [
         "Player Name": "Sal Dali",
         "Height": "41",
         "Soccer Experience": "No",
-        "guarGuardian NamedianName": "Gala Dali"
+        "Guardian Name": "Gala Dali"
     ],
     [
         "Player Name": "Joe Kavalier",
@@ -176,18 +176,10 @@ func distributePlayers() {
 // Distribute players
 distributePlayers()
 
-teamRosters
-
 // First practice dates hard coded by team
 var firstPractice: [String:String] = ["Sharks":"March 17, 3pm",
                                       "Dragons":"March 17, 1pm",
                                       "Raptors":"March 18, 1pm"]
-
-// Letter to the parents
-for player in players
-{
-    print("Dear \(player["Guardian Name"]),\r\nCongratulations! Welcome to the youth soccor league. We are happy to announce that the team rosters have been finalized and \(player["Player Name"]) has bean placed on the one and only \(teamRosters[player["Player Name"]!])! The \(teamRosters[player["Player Name"]!]) first practice will be held on \(firstPractice[teamRosters[player["Player Name"]!]!])")
-}
 
 // Dictionary declarations for
 var dataByTeam: [String: Any?] = [:]
@@ -213,7 +205,7 @@ func AssignPlData() -> [String: Any?] {
 }
 
 // Update dataByTeam
-dataByTeam = AssignPlData()
+AssignPlData()
 
 var updatedAvg: [String:Float] = [:]
 let playerCount: Float = Float(plData.count)
@@ -225,7 +217,7 @@ func avgCalc() -> [String:Float] {
     
     for tn in teamName
     {
-        eachTeam = AssignPlData()[tn] as! [String : Float]
+        eachTeam = dataByTeam[tn] as! [String : Float]
         
         let teamHeights: [Float] = Array(eachTeam.values)
         for th in teamHeights
@@ -241,41 +233,46 @@ func avgCalc() -> [String:Float] {
     return updatedAvg
 }
 
-var averages = avgCalc()
+avgCalc()
+
 var shortestAvgHeight: Float = 1000.0
 var tallestAvgHeight: Float = 0.0
 var shortestTeam: String = ""
 var tallestTeam: String = ""
 
 func teamsToSwap() {
-// Calculate shortest team name and it's average height
-for team in averages
-{
-    if (team.value < shortestAvgHeight)
+    // Calculate shortest team name and it's average height
+    shortestAvgHeight = 1000.0
+    tallestAvgHeight = 0.0
+    for team in updatedAvg
     {
-        shortestAvgHeight = team.value
-        shortestTeam = team.key
+        if (team.value <= shortestAvgHeight)
+        {
+            shortestAvgHeight = team.value
+            shortestTeam = team.key
+        }
     }
-}
-
-// Calculate tallest team name and it's average height
-for team in averages
-{
-    if (team.value > tallestAvgHeight)
+    
+    // Calculate tallest team name and it's average height
+    for team in updatedAvg
     {
-        tallestAvgHeight = team.value
-        tallestTeam = team.key
+        if (team.value >= tallestAvgHeight)
+        {
+            tallestAvgHeight = team.value
+            tallestTeam = team.key
+        }
     }
-}
 }
 teamsToSwap()
 
 
 // Calculate difference between tallest and shortest team averages
 var diff = tallestAvgHeight - shortestAvgHeight
-
+var newDiff = diff
 // Determines if the team averages are within or outside of the 1.5inch limit and if they are not balanced correctly executes the following code
-if tallestAvgHeight - shortestAvgHeight > 1.5 {
+repeat {
+    
+    diff = newDiff
     
     // Dictionary for tallest team players and their heights
     var tallestRoster: [String:Float] = [:]
@@ -289,8 +286,8 @@ if tallestAvgHeight - shortestAvgHeight > 1.5 {
     var plHtTallest: Float = 0.0
     var plNameShortest = ""
     var plHtShortest: Float = 0.0
-    var minDiff: Float = 1000.0
-    
+    var minDifSoFar: Float = 1000.0
+    var curDiff: Float
     
     // Determines the tallest player from the tallest average team
     for pl in tallestRoster
@@ -305,8 +302,9 @@ if tallestAvgHeight - shortestAvgHeight > 1.5 {
     // Iterates through the roster of the shortest average team to find the player who's height difference to plNameTallest is closest to the height diff I am looking for
     for pl in shortestRoster
     {
-        if (plHtTallest - pl.value) - diff < minDiff {
-            minDiff = pl.value
+        curDiff = abs((plHtTallest - pl.value) - diff)
+        if curDiff < minDifSoFar {
+            minDifSoFar = curDiff
             plNameShortest = pl.key
             plHtShortest = pl.value
         }
@@ -315,20 +313,20 @@ if tallestAvgHeight - shortestAvgHeight > 1.5 {
     // Switches the players to the other team by updating the teamRosters data
     teamRosters[plNameShortest] = tallestTeam
     teamRosters[plNameTallest] = shortestTeam
+    dataByTeam = AssignPlData()
     
     // Recalculates average
-    var swappedAverages = avgCalc()
+    updatedAvg = avgCalc()
+    
     teamsToSwap()
     
-    /*
-     
-    Extra credit Notes
-        - While this logic does successfully bring the teams within a 1.5 inch average height difference, it doesn't work as a loop to swap until the teams are as close as possible like I had originally intended
-        - I wanted to set up a while loop that executed the player swap 'while tallestAvgHeight - shortestAvgHeight > 1.5'
-        - I was unable to pass my updated average calculation back to the if (or while) statement
-        - I think (not sure) if i could declare a new type 'averages' and have my teams to swap method accept that as a parameter I could pass in the swapped averages here at the bottom of the while loop to get an update tallestAvgHeight and shortestAvgHeight for the loop
-        - It would look like func teamsToSwap(averages Avg) {...} up above and teamsToSwap(swappedAverages) down here
-     
-    */
+    newDiff = tallestAvgHeight - shortestAvgHeight
     
+} while newDiff < diff
+
+
+// Letter to the parents
+for player in players
+{
+    print("Dear \(player["Guardian Name"]!),\r\nWelcome to the youth soccor league. We are happy to announce that the team rosters have been finalized and \(player["Player Name"]!) has bean placed on the \(teamRosters[player["Player Name"]!]!). The \(teamRosters[player["Player Name"]!]!) first practice will be held on \(firstPractice[teamRosters[player["Player Name"]!]!]!)\n")
 }
